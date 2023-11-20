@@ -19,3 +19,10 @@ We have submitted our project multiple times, each time refining and improving o
 7. Not
 8. Not
 9. Not 
+
+
+# Run Docker
+
+```
+docker run --rm  -it -p 8888:8888 --entrypoint jupyter -w /workspace -v ${PWD}:/workspace webis/ir-lab-wise-2023:0.0.1 notebook --allow-root --ip 0.0.0.0
+```
