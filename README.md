@@ -16,4 +16,6 @@ We have submitted our project multiple times, each time refining and improving o
 4. Yes
 5. For further submissions
 6. Yes (with values from the lecture VL), and further submissions (with our own parameters)
-7. 8. 9. Not
+7. Not
+8. Not
+9. Not 
