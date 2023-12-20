@@ -1,0 +1,5 @@
+# BEGIN: /home/johannes/Projects/advanced-information-retrival/.gitignore
+env/
+**/env/
+**/out/
+# END: /home/johannes/Projects/advanced-information-retrival/.gitignore
