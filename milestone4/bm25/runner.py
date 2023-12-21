@@ -1,7 +1,10 @@
 import docker
 import json
 import tarfile
+import time
+import os
 client = docker.from_env()
+from io import BytesIO
 #docker build . -t bm25
 # if python-minimal doesnt want to be installed https://askubuntu.com/questions/1461807/i-cant-install-python3-10-minimal-on-ubuntu-22-04-lts-in-container
 
@@ -27,6 +30,7 @@ def main_loop():
                 running_jobs_containers.append([job,container])
         if len(jobs) == 0 and len(running_jobs_containers) == 0:
             break
+    time.sleep(1)
 
     
 
@@ -50,7 +54,13 @@ def check_container(container,job):
     print("unknown",container,"status", container.status,"job:" ,job)
     return False
 
-def persist_container(container, job):
+def persist_container(container, job): 
+    # time dependet foldername as number
+    folder = str(int(time.time()*1000))
+    foldername = "milestone4/bm25/out/"+folder
+    #create folder
+    os.mkdir(foldername)   
+    
     #print("persisting container", container)
     #print(json.dumps(container.diff()))
     k_1 = job["k_1"]
@@ -58,22 +68,30 @@ def persist_container(container, job):
     container.restart()
     while container.status != "running":
         container.reload()
-    archive = container.get_archive("/app/grid-search/training/bm25-b={b}-k_1={k_1}/run.txt".format(b=b,k_1=k_1))
-    #print(archive)
-    with tarfile.open(fileobj=archive.data, mode='r') as tar:
+    archive_data,_ = container.get_archive("/app/grid-search/training/bm25-b={b}-k_1={k_1}/run.txt".format(b=b,k_1=k_1))
+    archive_bytes = b"".join(archive_data)
+    with tarfile.open(fileobj=BytesIO(archive_bytes), mode='r') as tar:
         # Assuming there is only one file in the archive
         file_info = tar.getmembers()[0]
-        file_content_1 = tar.extractfile(file_info).read()
+        file_content = tar.extractfile(file_info).read()
+    with open(foldername+"/run.txt", 'w') as outfile:
+        outfile.write(file_content.decode("utf-8"))
 
-    archive = container.get_archive("/app/grid-search/validation.csv".format(b=b,k_1=k_1))
-    #print(archive)
-    with tarfile.open(fileobj=archive.data, mode='r') as tar:
+    archive_data,_ = container.get_archive("/app/grid-search/validation.csv")
+    archive_bytes = b"".join(archive_data)
+    with tarfile.open(fileobj=BytesIO(archive_bytes), mode='r') as tar:
         # Assuming there is only one file in the archive
         file_info = tar.getmembers()[0]
-        file_content_2 = tar.extractfile(file_info).read()
-    # Print the content
+        file_content = tar.extractfile(file_info).read()
+    print(file_content.decode("utf-8"))
+
+    with open(foldername+"/validation.csv", 'w') as outfile:
+        outfile.write(file_content.decode("utf-8"))
+
+    #metadata
+    metadata = {"k_1": k_1, "b": b, "eval_metrics": job["eval_metrics"], "id": folder}
+    with open(foldername+"/metadata.json", 'w') as outfile:
+        json.dump(metadata, outfile)
     container.stop()
-    print(file_content_1.decode('utf-8'))
-    print(file_content_2.decode('utf-8'))
 
 main_loop()
