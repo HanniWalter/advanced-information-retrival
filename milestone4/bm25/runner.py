@@ -3,6 +3,7 @@ import json
 import tarfile
 import time
 import os
+import datetime
 client = docker.from_env()
 from io import BytesIO
 #docker build . -t bm25
@@ -11,7 +12,9 @@ from io import BytesIO
 
 jobs = []
 for i in range(1):
-    jobs.append({"k_1": 1.2, "b": 0.6, "eval_metrics": ";".join(['ndcg_cut_5'])})
+    for k_1 in range(0.5,1.51,0.1):
+        for b in range(0.5,1,0.1):
+            jobs.append({"k_1": k_1, "b": b, "eval_metrics": ";".join(['ndcg_cut_5'])})
 running_jobs_containers = []
 max_jobs_running = 1
 
@@ -88,8 +91,9 @@ def persist_container(container, job):
     with open(foldername+"/validation.csv", 'w') as outfile:
         outfile.write(file_content.decode("utf-8"))
 
-    #metadata
+    #metadatametadata
     metadata = {"k_1": k_1, "b": b, "eval_metrics": job["eval_metrics"], "id": folder}
+    metadata["completed"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(foldername+"/metadata.json", 'w') as outfile:
         json.dump(metadata, outfile)
     container.stop()
