@@ -2,4 +2,5 @@
 env/
 **/env/
 **/out/
+**/out_old/
 # END: /home/johannes/Projects/advanced-information-retrival/.gitignore
