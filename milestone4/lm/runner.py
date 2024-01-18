@@ -1,4 +1,3 @@
-import numpy as np
 from io import BytesIO
 import docker
 import json
@@ -70,7 +69,7 @@ def persist_container(container, job):
     while container.status != "running":
         container.reload()
     archive_data, _ = container.get_archive(
-        "/app/grid-search/training/bm25-b=-k_1=/run.txt")
+        "/app/grid-search/training/lm/training/run.txt")
     archive_bytes = b"".join(archive_data)
     with tarfile.open(fileobj=BytesIO(archive_bytes), mode='r') as tar:
         # Assuming there is only one file in the archive
@@ -79,7 +78,7 @@ def persist_container(container, job):
     with open(foldername+"/run.txt", 'w') as outfile:
         outfile.write(file_content.decode("utf-8"))
 
-    archive_data, _ = container.get_archive("/app/grid-search/validation.csv")
+    archive_data, _ = container.get_archive("/app/lm/validation.csv")
     archive_bytes = b"".join(archive_data)
     with tarfile.open(fileobj=BytesIO(archive_bytes), mode='r') as tar:
         # Assuming there is only one file in the archive
