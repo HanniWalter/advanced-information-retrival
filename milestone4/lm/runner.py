@@ -10,10 +10,10 @@ client = docker.from_env()
 # if python-minimal doesnt want to be installed https://askubuntu.com/questions/1461807/i-cant-install-python3-10-minimal-on-ubuntu-22-04-lts-in-container
 
 jobs = []
-for mu in [1000]:  # [1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600]:
+for mu in [1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000]:
     jobs.append({"mu": mu})
 running_jobs_containers = []
-max_jobs_running = 6
+max_jobs_running = 8
 
 
 def main_loop():
@@ -69,7 +69,7 @@ def persist_container(container, job):
     while container.status != "running":
         container.reload()
     archive_data, _ = container.get_archive(
-        "/app/grid-search/training/lm/training/run.txt")
+        "/app/lm/training/run.txt")
     archive_bytes = b"".join(archive_data)
     with tarfile.open(fileobj=BytesIO(archive_bytes), mode='r') as tar:
         # Assuming there is only one file in the archive
@@ -90,6 +90,8 @@ def persist_container(container, job):
 
     # metadatametadata
     metadata = {"id": folder}
+    metadata["mu"] = job["mu"]
+    metadata["type"] = "lm"
     metadata["completed"] = datetime.datetime.now().strftime(
         "%Y-%m-%d %H:%M:%S")
     with open(foldername+"/metadata.json", 'w') as outfile:
