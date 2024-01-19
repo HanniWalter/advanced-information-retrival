@@ -16,7 +16,7 @@ for mu in [1800]:
             jobs.append({"mu": mu, "k_1": k_1, "b": b,
                          "eval_metrics": ";".join(['ndcg_cut_5', 'ndcg_cut_10', 'P_10'])})
 running_jobs_containers = []
-max_jobs_running = 8
+max_jobs_running = 1
 
 
 def main_loop():
@@ -43,7 +43,7 @@ def start_container(job):
     b = job["b"]
 
     print("starting container", mu, k_1, b)
-    container = client.containers.run("lm", detach=True, environment=[
+    container = client.containers.run("ltr", detach=True, environment=[
                                       "LM_mu={mu}".format(mu=mu),
                                       "BM25_k_1={k_1}".format(k_1=k_1),
                                       "BM25_b={b}".format(b=b),
@@ -91,7 +91,7 @@ def persist_container(container, job):
     metadata["mu"] = job["mu"]
     metadata["k_1"] = job["k_1"]
     metadata["b"] = job["b"]
-    metadata["type"] = "lm"
+    metadata["type"] = "ltr"
     metadata["completed"] = datetime.datetime.now().strftime(
         "%Y-%m-%d %H:%M:%S")
     with open(foldername+"/metadata.json", 'w') as outfile:
