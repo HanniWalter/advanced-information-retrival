@@ -39,8 +39,10 @@ def main_loop():
 
 def start_container(job):
     mu = job["mu"]
+    k_1 = job["k_1"]
+    b = job["b"]
 
-    print("starting container", mu)
+    print("starting container", mu, k_1, b)
     container = client.containers.run("lm", detach=True, environment=[
                                       "LM_mu={mu}".format(mu=mu),
                                       "BM25_k_1={k_1}".format(k_1=k_1),

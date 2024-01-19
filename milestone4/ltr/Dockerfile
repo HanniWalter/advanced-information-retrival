@@ -16,6 +16,6 @@ RUN mkdir /app/
 WORKDIR /app/
 COPY . .
 
-RUN jupyter nbconvert --to python lm.ipynb
+RUN jupyter nbconvert --to python ltr_final.ipynb
 
-CMD python3 lm.py
+CMD python3 ltr_final.py
