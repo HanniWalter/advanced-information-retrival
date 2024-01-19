@@ -10,9 +10,9 @@ client = docker.from_env()
 # if python-minimal doesnt want to be installed https://askubuntu.com/questions/1461807/i-cant-install-python3-10-minimal-on-ubuntu-22-04-lts-in-container
 
 jobs = []
-for mu in [1800]:
-    for k_1 in [1.4]:
-        for b in [0.75]:
+for mu in [1000, 1100, 1200, 2900, 3000]:
+    for k_1 in [0.4, 0.7, 0.8, 1.1, 1.2, 1.3]:
+        for b in [0.1, 0.3, 0.7, 0.8, 0.9]:
             jobs.append({"mu": mu, "k_1": k_1, "b": b,
                          "eval_metrics": ";".join(['ndcg_cut_5', 'ndcg_cut_10', 'P_10'])})
 running_jobs_containers = []

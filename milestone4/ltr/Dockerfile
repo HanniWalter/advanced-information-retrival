@@ -14,8 +14,9 @@ RUN apt-get update \
 
 RUN mkdir /app/
 WORKDIR /app/
+RUN mkdir output/
 
-COPY ./input ./input
+COPY ./input/ ./input/
 COPY . .
 
 RUN jupyter nbconvert --to python ltr_final.ipynb
