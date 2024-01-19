@@ -10,12 +10,8 @@ client = docker.from_env()
 # if python-minimal doesnt want to be installed https://askubuntu.com/questions/1461807/i-cant-install-python3-10-minimal-on-ubuntu-22-04-lts-in-container
 
 jobs = []
-for i in range(1):
-    for k_1 in [1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]:
-        for b in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
-
-            jobs.append(
-                {"k_1": k_1, "b": b, "eval_metrics": ";".join(['ndcg_cut_5', 'ndcg_cut_10', 'P_10'])})
+for mu in [1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000]:
+    jobs.append({"mu": mu})
 running_jobs_containers = []
 max_jobs_running = 8
 
@@ -39,11 +35,11 @@ def main_loop():
 
 
 def start_container(job):
-    k_1 = job["k_1"]
-    b = job["b"]
-    print("starting container", k_1, b)
-    container = client.containers.run("bm25", detach=True, environment=["BM25_k_1={k_1}".format(
-        k_1=k_1), "BM25_b={b}".format(b=b), "EVAL_METRIC={eval_metrics}".format(eval_metrics=job["eval_metrics"])])
+    mu = job["mu"]
+
+    print("starting container", mu)
+    container = client.containers.run("lm", detach=True, environment=[
+                                      "LM_mu={mu}".format(mu=mu)])
     return container
 
 
@@ -63,19 +59,17 @@ def check_container(container, job):
 def persist_container(container, job):
     # time dependet foldername as number
     folder = str(int(time.time()*1000))
-    foldername = "milestone4/bm25/out/"+folder
+    foldername = "milestone4/lm/out/"+folder
     # create folder
     os.mkdir(foldername)
 
     # print("persisting container", container)
     # print(json.dumps(container.diff()))
-    k_1 = job["k_1"]
-    b = job["b"]
     container.restart()
     while container.status != "running":
         container.reload()
     archive_data, _ = container.get_archive(
-        "/app/grid-search/training/bm25-b={b}-k_1={k_1}/run.txt".format(b=b, k_1=k_1))
+        "/app/lm/training/run.txt")
     archive_bytes = b"".join(archive_data)
     with tarfile.open(fileobj=BytesIO(archive_bytes), mode='r') as tar:
         # Assuming there is only one file in the archive
@@ -84,7 +78,7 @@ def persist_container(container, job):
     with open(foldername+"/run.txt", 'w') as outfile:
         outfile.write(file_content.decode("utf-8"))
 
-    archive_data, _ = container.get_archive("/app/grid-search/validation.csv")
+    archive_data, _ = container.get_archive("/app/lm/validation.csv")
     archive_bytes = b"".join(archive_data)
     with tarfile.open(fileobj=BytesIO(archive_bytes), mode='r') as tar:
         # Assuming there is only one file in the archive
@@ -95,8 +89,9 @@ def persist_container(container, job):
         outfile.write(file_content.decode("utf-8"))
 
     # metadatametadata
-    metadata = {"k_1": k_1, "b": b,
-                "eval_metrics": job["eval_metrics"], "id": folder}
+    metadata = {"id": folder}
+    metadata["mu"] = job["mu"]
+    metadata["type"] = "lm"
     metadata["completed"] = datetime.datetime.now().strftime(
         "%Y-%m-%d %H:%M:%S")
     with open(foldername+"/metadata.json", 'w') as outfile:
