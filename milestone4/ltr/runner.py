@@ -12,11 +12,11 @@ client = docker.from_env()
 jobs = []
 for mu in [1000, 1100, 1200, 2900, 3000]:
     for k_1 in [0.4, 0.7, 0.8, 1.1, 1.2, 1.3]:
-        for b in [0.1, 0.3, 0.7, 0.8, 0.9]:
+        for b in [0.2, 0.5]:  # [0.1,0.2, 0.3, 0.5, 0.7, 0.8, 0.9]:
             jobs.append({"mu": mu, "k_1": k_1, "b": b,
                          "eval_metrics": ";".join(['ndcg_cut_5', 'ndcg_cut_10', 'P_10'])})
 running_jobs_containers = []
-max_jobs_running = 1
+max_jobs_running = 6
 
 
 def main_loop():
