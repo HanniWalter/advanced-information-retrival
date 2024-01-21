@@ -121,6 +121,7 @@ def bm25_get_scores():
 def ltr_get_scores():
     scores = {}
     mus, k_1s, bs = ltr_get_all_configs()
+
     for mu in mus:
         scores[mu] = {}
         for k_1 in k_1s:
@@ -233,6 +234,29 @@ def ltr_tablelise():
     for mu in sorted(mus):
         for k_1 in sorted(k_1s):
             for b in sorted(bs):
+                if b == 0.75:
+                    continue
+
+                bm25_ndcg_cut_10 = scores[mu][k_1][b]["bm25_ndcg_cut_10"]
+                bm25_ndcg_cut_5 = scores[mu][k_1][b]["bm25_ndcg_cut_5"]
+                bm25_p_10 = scores[mu][k_1][b]["bm25_P_10"]
+
+                lm_ndcg_cut_10 = scores[mu][k_1][b]["lm_ndcg_cut_10"]
+                lm_ndcg_cut_5 = scores[mu][k_1][b]["lm_ndcg_cut_5"]
+                lm_p_10 = scores[mu][k_1][b]["lm_P_10"]
+
+                ltr_ndcg_cut_10 = scores[mu][k_1][b]["ltr_ndcg_cut_10"]
+                ltr_ndcg_cut_5 = scores[mu][k_1][b]["ltr_ndcg_cut_5"]
+                ltr_p_10 = scores[mu][k_1][b]["ltr_P_10"]
+
+                l.append([mu, k_1, b,
+                          bm25_ndcg_cut_10, bm25_ndcg_cut_5, bm25_p_10,
+                          lm_ndcg_cut_10, lm_ndcg_cut_5, lm_p_10,
+                          ltr_ndcg_cut_10, ltr_ndcg_cut_5, ltr_p_10])
+    for mu in [2500]:
+        for k_1 in [1.2]:
+            for b in [0.75]:
+
                 bm25_ndcg_cut_10 = scores[mu][k_1][b]["bm25_ndcg_cut_10"]
                 bm25_ndcg_cut_5 = scores[mu][k_1][b]["bm25_ndcg_cut_5"]
                 bm25_p_10 = scores[mu][k_1][b]["bm25_P_10"]
