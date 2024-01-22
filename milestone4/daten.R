@@ -1,6 +1,6 @@
 library(ggplot2)
 
-df<-read.csv("C:/Users/Max/Documents/Uni/Studium/Advanced Information Retrieval/Praktikum/table.csv")
+df<-read.csv("...") #path
 
 ggplot(data=df,aes(x=k_1,y=bm25_ndcg_cut_10))+geom_point()
 ggplot(data=df,aes(x=b,y=bm25_ndcg_cut_10))+geom_point()
